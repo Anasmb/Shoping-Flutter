@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Product {
   final String id;
@@ -6,7 +6,14 @@ class Product {
   final String description;
   final double price;
   final String imageUrl;
-  bool isFavorite; // not final because it is changeble 
+  bool isFavorite; // not final because it is changeble
 
-  Product({@required this.id , @required this.title , @required this.description, @required this.price , @required this.imageUrl,})
+  Product({
+    @required this.id,
+    @required this.title,
+    @required this.description,
+    @required this.price,
+    @required this.imageUrl,
+    this.isFavorite = false,
+  });
 }
