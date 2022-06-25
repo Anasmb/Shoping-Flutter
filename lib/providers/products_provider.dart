@@ -1,6 +1,6 @@
 import 'package:flutter/Material.dart';
 
-import '../models/product.dart';
+import './product.dart';
 
 class ProductsProvider with ChangeNotifier {
   List<Product> _items = [
@@ -42,6 +42,14 @@ class ProductsProvider with ChangeNotifier {
     return [
       ..._items
     ]; //return just the _items mean return the pointer of _items, but ... mean return a copy of the _items not the pointer.
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((element) => element.isFavorite).toList();
+  }
+
+  Product findById(String id) {
+    return _items.firstWhere((element) => id == element.id);
   }
 
   void addProduct() {

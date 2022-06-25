@@ -10,9 +10,11 @@ class ProductDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final productId =
         ModalRoute.of(context).settings.arguments as String; // the id
-    final loadedProduct = Provider.of<ProductsProvider>(context)
-        .items
-        .firstWhere((prod) => productId == prod.id);
+    final loadedProduct = Provider.of<ProductsProvider>(context, listen: false)
+        .findById(
+            productId); // listen argument the default is true, if it false it means that this widget will not rebuild if ProductsProviders changed.
+    // we set it to false if we only need the data one time
+
     return Scaffold(
       appBar: AppBar(
         title: Text(loadedProduct.title),
