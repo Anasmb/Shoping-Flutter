@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/providers/products_provider.dart';
+import 'package:flutter_complete_guide/screens/cart_screen.dart';
 
 import 'package:provider/provider.dart';
 import '../widgets/product_item.dart';
+import '../widgets/badge.dart';
+import '../providers/cart.dart';
 
 enum FilterOptions { Favorites, All }
 
@@ -40,7 +43,18 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
               )
             ],
             icon: Icon(Icons.more_vert),
-          )
+          ),
+          Consumer<Cart>(
+            // we use consumer here instead of provider above the scaffold, because we dont want to rebuild the whole scaffold we only want to rebuild the badge
+            builder: (ctx, cart, ch) =>
+                Badge(child: ch, value: cart.itemCount.toString()),
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
+          ),
         ],
       ),
       body: ProductGrid(_showOnlyFavorites),
@@ -67,11 +81,7 @@ class ProductGrid extends StatelessWidget {
           mainAxisSpacing: 10),
       itemBuilder: (context, index) => ChangeNotifierProvider.value(
         value: products[index],
-        child: ProductItem(
-            // products[index].id,
-            // products[index].title,
-            // products[index].imageUrl,
-            ),
+        child: ProductItem(),
       ),
     );
   }

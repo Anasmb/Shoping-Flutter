@@ -3,12 +3,14 @@ import 'package:provider/provider.dart';
 
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
+import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(
         context); //using consumer gives the same result but more optimizated
+    final cart = Provider.of<Cart>(context, listen: false);
     return ClipRRect(
       // this widget allow us to make rouded corner
       borderRadius: BorderRadius.circular(10),
@@ -37,7 +39,9 @@ class ProductItem extends StatelessWidget {
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               color: Theme.of(context).accentColor),
           trailing: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              cart.addItem(product.id, product.price, product.title);
+            },
             icon: Icon(Icons.shopping_cart),
             color: Theme.of(context).accentColor,
           ),
