@@ -21,10 +21,10 @@ class CartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: Key(productId),
+      key: Key(id),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
-        return Provider.of<Cart>(context, listen: false).removeItem(id);
+        return Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
       background: Container(
         color: Theme.of(context).errorColor,
