@@ -52,8 +52,24 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((element) => id == element.id);
   }
 
-  void addProduct() {
-    // _items.add(value);
+  void addProduct(Product product) {
+    final newProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl);
+    _items.add(newProduct);
     notifyListeners(); // to notify all the widget that listening this class that a data has changed
+  }
+
+  void updateProduct(String id, Product updatedProduct) {
+    final productIndex = _items.indexWhere((element) => element.id == id);
+    if (productIndex >= 0) {
+      _items[productIndex] = updatedProduct;
+      notifyListeners();
+    } else {
+      print("cannot update a product that does not exist!");
+    }
   }
 }
