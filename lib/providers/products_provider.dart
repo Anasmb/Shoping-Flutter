@@ -72,4 +72,9 @@ class ProductsProvider with ChangeNotifier {
       print("cannot update a product that does not exist!");
     }
   }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
 }
