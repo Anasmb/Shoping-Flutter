@@ -54,28 +54,36 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((element) => id == element.id);
   }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     final url =
-        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products.json";
-    http
-        .post(url,
-            body: json.encode({
-              "title": product.title,
-              "description": product.description,
-              "imageUrl": product.imageUrl,
-              "price": product.price,
-              "isFavorite": product.isFavorite,
-            }))
-        .then((response) {
+        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products";
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            "title": product.title,
+            "description": product.description,
+            "imageUrl": product.imageUrl,
+            "price": product.price,
+            "isFavorite": product.isFavorite,
+          }));
+
       final newProduct = Product(
-          id: DateTime.now().toString(),
+          id: json.decode(response.body)["name"],
           title: product.title,
           description: product.description,
           price: product.price,
           imageUrl: product.imageUrl);
       _items.add(newProduct);
       notifyListeners(); // to notify all the widget that listening this class that a data has changed
-    });
+
+    } catch (error) {
+      throw error;
+    }
+    // .then((response) {
+
+    // }).catchError((error) {
+    //
+    //  });
   }
 
   void updateProduct(String id, Product updatedProduct) {
