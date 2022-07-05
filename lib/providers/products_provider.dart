@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/Material.dart';
+import 'package:flutter_complete_guide/models/http_exception.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; //convert date into JSON
 
@@ -60,6 +63,9 @@ class ProductsProvider with ChangeNotifier {
     try {
       final response = await http.get(url);
       final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
+        return;
+      }
       final List<Product> loadedProducts = [];
       extractedData.forEach((productId, productData) {
         loadedProducts.add(Product(
@@ -129,7 +135,7 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     final url =
         "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json";
     // we store the deleted product in the memory in case of error occurs
@@ -138,12 +144,12 @@ class ProductsProvider with ChangeNotifier {
     var deletedProduct = _items[deletedProductIndex];
     _items.removeAt(deletedProductIndex);
     notifyListeners();
-    http.delete(url).then((_) {
-      deletedProduct = null;
-    }).catchError((_) {
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
       _items.insert(deletedProductIndex, deletedProduct);
       notifyListeners();
-    });
-    // _items.removeWhere((element) => element.id == id);
+      throw HttpException("Could not delete product.");
+    }
+    deletedProduct = null;
   }
 }
