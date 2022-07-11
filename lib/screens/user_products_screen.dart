@@ -12,12 +12,11 @@ class UserProductsScreen extends StatelessWidget {
 
   Future<void> _refreshProducts(BuildContext context) async {
     await Provider.of<ProductsProvider>(context, listen: false)
-        .fetchProductsFromServer();
+        .fetchProductsFromServer(true);
   }
 
   @override
   Widget build(BuildContext context) {
-    final productsData = Provider.of<ProductsProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Products"),
@@ -31,24 +30,33 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: EdgeInsets.all(8),
-          child: ListView.builder(
-            itemCount: productsData.items.length,
-            itemBuilder: (context, index) => Column(
-              children: [
-                UserProductItem(
-                  productsData.items[index].id,
-                  productsData.items[index].title,
-                  productsData.items[index].imageUrl,
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (context, snapshot) => snapshot == ConnectionState.waiting
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : RefreshIndicator(
+                onRefresh: () => _refreshProducts(context),
+                child: Consumer<ProductsProvider>(
+                  builder: (context, productsData, _) => Padding(
+                    padding: EdgeInsets.all(8),
+                    child: ListView.builder(
+                      itemCount: productsData.items.length,
+                      itemBuilder: (context, index) => Column(
+                        children: [
+                          UserProductItem(
+                            productsData.items[index].id,
+                            productsData.items[index].title,
+                            productsData.items[index].imageUrl,
+                          ),
+                          Divider(),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-                Divider(),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }
