@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   @override
@@ -11,6 +12,7 @@ class ProductItem extends StatelessWidget {
     final product = Provider.of<Product>(
         context); //using consumer gives the same result but more optimizated
     final cart = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       // this widget allow us to make rouded corner
       borderRadius: BorderRadius.circular(10),
@@ -33,7 +35,7 @@ class ProductItem extends StatelessWidget {
           ),
           leading: IconButton(
               onPressed: () {
-                product.toggleFavoriteStatus();
+                product.toggleFavoriteStatus(authData.token, authData.userId);
               },
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),

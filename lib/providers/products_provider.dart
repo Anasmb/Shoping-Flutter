@@ -43,6 +43,11 @@ class ProductsProvider with ChangeNotifier {
     // ),
   ];
 
+  final String authToken;
+  final String userId;
+
+  ProductsProvider(this.authToken, this.userId, this._items);
+
   List<Product> get items {
     return [
       ..._items
@@ -58,14 +63,20 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> fetchProductsFromServer() async {
-    const url =
-        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products.json";
+    var url =
+        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=" +
+            authToken;
     try {
       final response = await http.get(url);
       final extractedData = jsonDecode(response.body) as Map<String, dynamic>;
       if (extractedData == null) {
         return;
       }
+      url =
+          "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId.json?auth=" +
+              authToken;
+      final favoriterResponse = await http.get(url);
+      final favoriteData = jsonDecode(favoriterResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((productId, productData) {
         loadedProducts.add(Product(
@@ -74,7 +85,10 @@ class ProductsProvider with ChangeNotifier {
           description: productData["description"],
           price: productData["price"],
           imageUrl: productData["imageUrl"],
-          isFavorite: productData["isFavorite"],
+          isFavorite: favoriteData == null
+              ? false
+              : favoriteData[productId] ??
+                  false, //?? means if there is no entry for prodId it will be false
         ));
       });
       _items = loadedProducts;
@@ -85,8 +99,9 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    const url =
-        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products.json";
+    final url =
+        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=" +
+            authToken;
     try {
       final response = await http.post(url,
           body: json.encode({
@@ -94,7 +109,6 @@ class ProductsProvider with ChangeNotifier {
             "description": product.description,
             "imageUrl": product.imageUrl,
             "price": product.price,
-            "isFavorite": product.isFavorite,
           }));
 
       final newProduct = Product(
@@ -120,7 +134,8 @@ class ProductsProvider with ChangeNotifier {
     final productIndex = _items.indexWhere((element) => element.id == id);
     if (productIndex >= 0) {
       final url =
-          "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json";
+          "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=" +
+              authToken;
       await http.patch(url, //TODO add try catch
           body: jsonEncode({
             "title": updatedProduct.title,
@@ -137,7 +152,8 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final url =
-        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json";
+        "https://flutter-project-c3fdd-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=" +
+            authToken;
     // we store the deleted product in the memory in case of error occurs
     final deletedProductIndex =
         _items.indexWhere((element) => element.id == id);
