@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_complete_guide/helpers/custom_route.dart';
 import 'package:flutter_complete_guide/providers/auth.dart';
 import 'package:provider/provider.dart';
 import '../screens/user_products_screen.dart';
@@ -33,6 +34,11 @@ class AppDrawer extends StatelessWidget {
             title: Text("Manage Products"),
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(UserProductsScreen.routeName),
+            // Navigator.of(context).pushReplacement(
+            //   CustomRoute(
+            //     builder: (ctx) => OrdersScreen(),
+            //   ),
+            // )
           ),
           Divider(),
           ListTile(
